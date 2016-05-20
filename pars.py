@@ -9,7 +9,7 @@ import re
 table = {}    # [name, branch, X, Y]
 n_station = 0
 
-f = open('metro.txt','r')       # data raw
+f = open('data\wiki\metro.txt','r')       # data raw
 pars = open('pars.txt','w')     # save to
 
 for i in range(1850):

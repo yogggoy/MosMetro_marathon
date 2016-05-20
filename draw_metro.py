@@ -6,17 +6,17 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import re
 
-rcParams["figure.figsize"] = (10,10)
-rcParams["figure.subplot.left"] = 0.05
-rcParams["figure.subplot.right"] = 0.95
-rcParams["figure.subplot.bottom"] = 0.05
-rcParams["figure.subplot.top"] = 0.95
-rcParams["figure.subplot.wspace"] = 0
-rcParams["figure.subplot.hspace"] = 0
+rcParams['figure.figsize'] = (10,10)
+rcParams['figure.subplot.left'] = 0.05
+rcParams['figure.subplot.right'] = 0.95
+rcParams['figure.subplot.bottom'] = 0.05
+rcParams['figure.subplot.top'] = 0.95
+rcParams['figure.subplot.wspace'] = 0
+rcParams['figure.subplot.hspace'] = 0
 
 table = {}      # table = [№_st, branch, X, Y, name, (direct)]
 n_station = 0
-f = open('metro.txt','r')       # data raw from wikipedia
+f = open('data\wiki\metro.txt','r')       # data raw from wikipedia
 for i in range(1850):
     line = f.readline()[:-1]
     if re.match(r'\|-', line):
@@ -44,6 +44,7 @@ f.close()
 # table[i] = [№_st, branch, X, Y, name, (direct)]
 G=nx.Graph()
 pos = {}
+labels = {}
 branch_list = {
     'Sokolnicheskaya'   :[[], '#EE2E22', 1],
     'Zamoskworetskaya'  :[[], '#47B85E', 2],
@@ -60,6 +61,7 @@ branch_list = {
 
 for i in table:
     pos[i] = (float(table[i][3]), float(table[i][2]))
+    labels[i] = table[i][4]
     G.add_node(i)
     if len(table[i])==6:
         G.add_edge(table[i][0], table[i][5], weight=int(table[i][1]) )
@@ -74,15 +76,16 @@ for i in branch_list:
                             edge_color=branch_list[i][1], width=2)
 
 nx.draw_networkx_nodes(G,pos,alpha=0.5,node_size=50,node_color='w')
-# nx.draw_networkx_labels(G,pos,font_size=10,font_color='r',font_family='sans-serif')
 
-text = table[1][4]  # название станции выводить в подписи на карте
+labels_n = {10:labels[10]}
+nx.draw_networkx_labels(G,pos,labels=labels_n,
+                    font_size=15,font_color='k',font_family='Poiret One')
 
 plt.plot()
 plt.figure(1, figuresize=(8,8))
 plt.axis('on')
 plt.axis([37.3, 37.9, 55.5, 55.95])
 plt.grid(True)
-plt.title(text,family="verdana")    # настроить вывод названия линии
-plt.savefig("metro.png")
+plt.title('Московское метро',family='Cambria',size='30')    # настроить вывод названия линии
+plt.savefig('metro.png')
 plt.show()
