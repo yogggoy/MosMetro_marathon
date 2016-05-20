@@ -2,3 +2,6 @@ solve.py
 .vscode
 VENV_F
 exampls
+frames*
+*.png
+error*

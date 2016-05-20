@@ -6,8 +6,8 @@ table = {}
 n_station = 0
 
 f = open('data\wiki\metro.txt','r')
-ya_action = open('data\yandex\ction.txt','r')
-ya_station = open('data\yandex\station.txt','r')
+ya_action = open(r'data\yandex\action.txt','r')
+ya_station = open(r'data\yandex\station.txt','r')
 
 for i in range(1850):
     line = f.readline()[:-1]
@@ -25,7 +25,7 @@ for i in range(1850):
 #==============================================================================
 # table[i] = [n_station, branch, '', '', name]
 #                 _0_     _1_    2    3  _4_
-patch = {}
+patch = {}      # [№_station, №_branch, name_branch, name_station, action/color]
 action = {
     'выход':'r',
     'проезд':'b',
