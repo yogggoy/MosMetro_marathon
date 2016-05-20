@@ -27,6 +27,7 @@ for i in range(1850):
         branch = re.findall(r'/цвет линии\|(\d+)', line)[0]
     if re.match(r'\| {{coord', line):
         name = re.findall(r'name=(.*)\|nogoogle', line)[0]
+        name = re.sub(r' [(].*','', name)        
         x_st, y_st = re.findall(r'(\d{2}.\d{4})', line)
 
 branch_prev = 0
@@ -46,18 +47,18 @@ G=nx.Graph()
 pos = {}
 labels = {}
 branch_list = {
-    'Sokolnicheskaya'   :[[], '#EE2E22', 1],
-    'Zamoskworetskaya'  :[[], '#47B85E', 2],
-    'Arbats_Pokrovsk'   :[[], '#0077BF', 3],
-    'Filyovskaya'       :[[], '#1AC1F3', 4],
-    'Kolcevaya'         :[[], '#884E35', 5],
-    'Kaluzhsk_Rizhsk'   :[[], '#F48232', 6],
-    'Tagansk_Krasnopr'  :[[], '#8D479B', 7],
-    'Kalininskaya'      :[[], '#FECB2F', 8],
-    'Serpux_Timiryaz'   :[[], '#A0A2A3', 9],
-    'Lublinskaya'       :[[], '#B3D345', 10],
-    'Kaxovskaya'        :[[], '#78CCCD', 11],
-    'Butovskaya'        :[[], '#ABBFE0', 12]}
+    1  :[[], '#EE2E22', 'Сокольническая'            ],
+    2  :[[], '#47B85E', 'Замоскворецкая'            ],
+    3  :[[], '#0077BF', 'Арбатско-Покровская'       ],
+    4  :[[], '#1AC1F3', 'Филевская'                 ],
+    5  :[[], '#884E35', 'Кольцевая'                 ],
+    6  :[[], '#F48232', 'Калужско-Рижская'          ],
+    7  :[[], '#8D479B', 'Таганско-Краснопресненская'],
+    8  :[[], '#FECB2F', 'Калининская'               ],
+    9  :[[], '#A0A2A3', 'Серпуховско-Тимирязевская' ],
+    10 :[[], '#B3D345', 'Люблинско-Дмитровская'     ],
+    11 :[[], '#78CCCD', 'Каховская'                 ],
+    12 :[[], '#ABBFE0', 'Бутовская'                 ]}
 
 for i in table:
     pos[i] = (float(table[i][3]), float(table[i][2]))
@@ -69,13 +70,14 @@ G.add_edge(76, 73, weight=4)
 
 for b in branch_list:
     branch_list[b][0] = [(u,v) for (u,v,d) in G.edges(data=True)
-                                if d['weight'] == branch_list[b][2]]
+                                if d['weight'] == b]
 
-for i in branch_list:
-    nx.draw_networkx_edges(G,pos,edgelist=branch_list[i][0],
-                            edge_color=branch_list[i][1], width=2)
+for b in branch_list:
+    nx.draw_networkx_edges(G,pos,edgelist=branch_list[b][0],
+                            edge_color=branch_list[b][1], width=2)
 
-nx.draw_networkx_nodes(G,pos,alpha=0.5,node_size=50,node_color='w')
+nx.draw_networkx_nodes(G,pos,alpha=0.75,node_size=50,node_color='w',
+                        node_shape='p',linewidths=0.5)  # so^>v<dph8
 
 labels_n = {10:labels[10]}
 nx.draw_networkx_labels(G,pos,labels=labels_n,
@@ -86,6 +88,6 @@ plt.figure(1, figuresize=(8,8))
 plt.axis('on')
 plt.axis([37.3, 37.9, 55.5, 55.95])
 plt.grid(True)
-plt.title('Московское метро',family='Cambria',size='30')    # настроить вывод названия линии
+plt.title('Московское метро',family='Cambria',size='30', color='k')    # настроить вывод названия линии
 plt.savefig('metro.png')
 plt.show()

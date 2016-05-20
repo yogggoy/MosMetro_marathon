@@ -6,7 +6,7 @@ parse the raw data from wiki, to complete table
 
 import re
 
-table = {}    # [name, branch, X, Y]
+table = {}      # table[i] = [№_st, branch, X, Y, name, (direct)]
 n_station = 0
 
 f = open('data\wiki\metro.txt','r')       # data raw
@@ -22,6 +22,7 @@ for i in range(1850):
         branch = re.findall(r'/цвет линии\|(\d+)', line)[0]
     if re.match(r'\| {{coord', line):
         name = re.findall(r'name=(.*)\|nogoogle', line)[0]
+        name = re.sub(r' [(].*','', name)
         x_st, y_st = re.findall(r'(\d{2}.\d{4})', line)
 
 branch_prev = 0
