@@ -1,78 +1,71 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import re
 
-table = {}
-n_station = 0
+from pars import parser
 
-f = open('data\wiki\metro.txt','r')
-ya_action = open(r'data\yandex\action.txt','r')
-ya_station = open(r'data\yandex\station.txt','r')
+link = r'data\wiki\metro.txt'
+table = parser(link)
 
-for i in range(1850):
-    line = f.readline()[:-1]
-    if re.match(r'\|-', line):
-        if n_station:
-            table[n_station] = [n_station, branch, '', '', name]
-        n_station = n_station+1
-    if re.match(r'\| style', line):
-        branch = re.findall(r'/цвет линии\|(\d+)', line)[0]
-    if re.match(r'\| {{coord', line):        
-        name = re.findall(r'name=(.*)\|nogoogle', line)[0]
-        name = re.sub(r' [(].*','', name)
-        name = re.sub(r'ё','е', name)
-        name = re.sub(r'Ё','Е', name)
-#==============================================================================
-# table[i] = [n_station, branch, '', '', name]
-#                 _0_     _1_    2    3  _4_
-patch = {}      # [№_station, №_branch, name_branch, name_station, action/color]
-action = {
-    'выход':'r',
-    'проезд':'b',
-    'разворот':'#BE00BE',
-    'пересадка':'#FFFF4B'}
+def link_tables(link_action, link_stasion):
+    '''
+    # NEW patch = [№_line, name_line, №_station, name_station, action/color]
+    '''
+    patch = {}
+    action = {
+        'выход':'r',            # red
+        'проезд':'b',           # blue
+        'разворот':'#BE00BE',   # pink
+        'пересадка':'#FFFF4B'}  # yellow
 
-branch_list = {
-    1  :[[], '#EE2E22', 'Сокольническая'            ],
-    2  :[[], '#47B85E', 'Замоскворецкая'            ],
-    3  :[[], '#0077BF', 'Арбатско-Покровская'       ],
-    4  :[[], '#1AC1F3', 'Филевская'                 ],
-    5  :[[], '#884E35', 'Кольцевая'                 ],
-    6  :[[], '#F48232', 'Калужско-Рижская'          ],
-    7  :[[], '#8D479B', 'Таганско-Краснопресненская'],
-    8  :[[], '#FECB2F', 'Калининская'               ],
-    9  :[[], '#A0A2A3', 'Серпуховско-Тимирязевская' ],
-    10 :[[], '#B3D345', 'Люблинско-Дмитровская'     ],
-    11 :[[], '#78CCCD', 'Каховская'                 ],
-    12 :[[], '#ABBFE0', 'Бутовская'                 ]}
+    ya_action = open(link_action, 'r')
+    ya_station = open(link_stasion, 'r')
 
-for i in range(1,455):  #455
-    line = ya_station.readline()[:-1]
-    stroka = line.split('.')    # ветка, название станции
-    for j in table:
-        if stroka[1].lower() == table[j][4].lower():
-            patch[i] = [table[j][0]]
+    for i in range(1,455):  #455
+        l = ya_station.readline()[:-1]
+        stroka = l.split('.')    # ветка, название станции
+        for j in table:
+            if (stroka[0].lower() == table[j][1].lower() and
+               stroka[1].lower() == table[j][3].lower()):
+                patch[i] = table[j][0:4]
+                break
+        else:
+            print ('!!! ERROR: СТАНЦИЯ или ВЕТКА не найдена. lines:',i)
+            print (r'action.txt line №',i,':',l)
             break
-    else:
-        print ('!!! ERROR: имена СТАНЦИЙ не совпадают. lines:',i)
-    for j in branch_list:
-        if stroka[0].lower() == branch_list[j][2].lower():
-            patch[i].append(j)
+
+        l = ya_action.readline()[:-1]
+        if l in action:
+            patch[i].append(action[l])
+        else:
+            print('!!! ERROR: ДЕЙСТВИЯ не совпадают. lines:', i)
             break
-    else:
-        print('!!! ERROR: имена ВЕТОК не совпадают. lines:',i)
-    patch[i].extend(stroka)
 
-    line = ya_action.readline()[:-1]
+    ya_action.close()
+    ya_station.close()
+    
+    return patch
 
-    if line in action:
-        patch[i].append(action[line])
-    else:
-        print('!!! ERROR: ДЕЙСТВИЯ не совпадают. lines:',i)
+def self_test(patch):
+    st_closed = [x for x in range(1,201)]
+    st_open = []
 
-for i in patch:
-    print(patch[i])
+    for i in range(1, 455):
+        if patch[i][2] in st_closed:
+            st_closed.remove(patch[i][2])
+        if patch[i][2] not in st_open:
+            st_open.append(patch[i][2])
 
-f.close()
-ya_action.close()
-ya_station.close()
+    if len(st_closed)>0 or len(st_open)<200:
+        print('WARNING: Что-то пошло не так.',
+               'Число посещенных станций не корректно')
+        print('число не открытых локаций : ', len(st_closed))
+        print('число открытых локаций    : ', len(st_open))
+
+if __name__ == "__main__":
+    link_action = r'data\yandex\action.txt'
+    link_stasion = r'data\yandex\station.txt'
+    patch = link_tables(link_action, link_stasion)
+    
+    self_test(patch)
+    for i in patch:
+        print(i, patch[i])

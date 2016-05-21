@@ -3,40 +3,69 @@
 """
 parse the raw data from wiki, to complete table
 """
-
 import re
 
-table = {}      # table[i] = [№_st, branch, X, Y, name, (direct)]
-n_station = 0
+lines_list = {
+    1  :[[], '#EE2E22', 'Сокольническая'            ],
+    2  :[[], '#47B85E', 'Замоскворецкая'            ],
+    3  :[[], '#0077BF', 'Арбатско-Покровская'       ],
+    4  :[[], '#1AC1F3', 'Филевская'                 ],
+    5  :[[], '#884E35', 'Кольцевая'                 ],
+    6  :[[], '#F48232', 'Калужско-Рижская'          ],
+    7  :[[], '#8D479B', 'Таганско-Краснопресненская'],
+    8  :[[], '#FECB2F', 'Калининская'               ],
+    9  :[[], '#A0A2A3', 'Серпуховско-Тимирязевская' ],
+    10 :[[], '#B3D345', 'Люблинско-Дмитровская'     ],
+    11 :[[], '#78CCCD', 'Каховская'                 ],
+    12 :[[], '#ABBFE0', 'Бутовская'                 ]}
 
-f = open(r'data\wiki\metro.txt','r')       # data raw
-pars = open('pars.txt','w')     # save to
+def parser(raw_patch):
+    '''
+    make pars from wiki data, and return dict 'table' with format: 
+    table[i] = [№_line, name_line, №_st, name_st, x_st, y_st]
+    # внимание!! при построении графа - добавить ребро на развилку
+    # между Киевской и Студенческой
+    '''
+    table = {}
+    num_st = 0
+    f = open(raw_patch, 'r')
 
-for i in range(1850):
-    line = f.readline()[:-1]
-    if re.match(r'\|-', line):
-        if n_station:
-            table[n_station] = [n_station, branch, x_st, y_st, name]
-        n_station = n_station+1
-    if re.match(r'\| style', line):
-        branch = re.findall(r'/цвет линии\|(\d+)', line)[0]
-    if re.match(r'\| {{coord', line):
-        name = re.findall(r'name=(.*)\|nogoogle', line)[0]
-        name = re.sub(r' [(].*','', name)
-        name = re.sub(r'ё','е', name)
-        name = re.sub(r'Ё','Е', name)
-        x_st, y_st = re.findall(r'(\d{2}.\d{4})', line)
+    for i in range(1850):
+        l = f.readline()[:-1]
+        if re.match(r'\|-', l):
+            if num_st:
+                #table[num_st] = [num_st, num_line, x_st, y_st, name_st]
+                table[num_st] = [num_line, name_line, num_st, name_st, x_st, y_st]
+            num_st = num_st+1
+        if re.match(r'\| style', l):
+            num_line = int(re.findall(r'/цвет линии\|(\d+)', l)[0])
+            name_line = lines_list[num_line][2]
+        if re.match(r'\| {{coord', l):
+            name_st = re.findall(r'name=(.*)\|nogoogle', l)[0]
+            name_st = re.sub(r' [(].*', '', name_st)
+            name_st = re.sub(r'ё', 'е', name_st)
+            x_st, y_st = re.findall(r'(\d{2}.\d{4})', l)
 
-branch_prev = 0
-# добавление ребер!! добавить ребро между Киевской и Студенческой
-for i in table:
-    if table[i][1] == branch_prev:
-        if (i != 141) & (i != 74):
-            table[i].append(i-1)
-    branch_prev = table[i][1]
-    if i == 80:
-        table[i].append(91)
-    pars.write(str(table[i])+'\n')
+    line_prev = 0
+    for i in range(1, len(table)+1):
+        if table[i][0] == line_prev:
+            if (i != 141)&(i != 74): # разрывы на ветках
+                table[i].append(i-1)
+        line_prev = table[i][0]
+        if i == 80:
+            table[i].append(91)     # замыкание кольцевой
 
-f.close()
-pars.close()
+    f.close()
+    return table
+
+if __name__ == "__main__":
+    patch = r'data\wiki\metro.txt'
+    table = parser(patch)
+
+    for i in range(1, len(table)+1):
+        print(table[i])
+
+    pars = open('pars.txt', 'w')     # save to
+    for i in table:
+        pars.write(str(table[i])+'\n')
+    pars.close()
