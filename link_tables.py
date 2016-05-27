@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
 from pars import parser
 
 link = r'data\wiki\metro.txt'
@@ -8,7 +7,8 @@ table = parser(link)
 
 def link_tables(link_action, link_stasion):
     '''
-    # NEW patch = [№_line, name_line, №_station, name_station, action/color]
+    make pars MetroMarafon-patch, and return dict 'patch' with format: 
+    # patch = [№_line, name_line, №_station, name_station, action/color]
     '''
     patch = {}
     action = {
@@ -22,14 +22,14 @@ def link_tables(link_action, link_stasion):
 
     for i in range(1,455):  #455
         l = ya_station.readline()[:-1]
-        stroka = l.split('.')    # ветка, название станции
+        stroka = l.split('.')    # 'ветка', 'название станции'
         for j in table:
             if (stroka[0].lower() == table[j][1].lower() and
                stroka[1].lower() == table[j][3].lower()):
                 patch[i] = table[j][0:4]
                 break
         else:
-            print ('!!! ERROR: СТАНЦИЯ или ВЕТКА не найдена. lines:',i)
+            print ('!!! ERROR: СТАНЦИЯ или ВЕТКА не найдена. lines:')
             print (r'action.txt line №',i,':',l)
             break
 
@@ -37,12 +37,12 @@ def link_tables(link_action, link_stasion):
         if l in action:
             patch[i].append(action[l])
         else:
-            print('!!! ERROR: ДЕЙСТВИЯ не совпадают. lines:', i)
+            print('!!! ERROR: ДЕЙСТВИЯ не совпадают. lines:', i, '-', l)
             break
 
     ya_action.close()
     ya_station.close()
-    
+
     return patch
 
 def self_test(patch):

@@ -22,7 +22,7 @@ lines_list = {
 def parser(raw_patch):
     '''
     make pars from wiki data, and return dict 'table' with format: 
-    table[i] = [№_line, name_line, №_st, name_st, x_st, y_st]
+    table[i] = [№_line, name_line, №_st, name_st, x_st, y_st, (link)]
     # внимание!! при построении графа - добавить ребро на развилку
     # между Киевской и Студенческой
     '''
@@ -34,8 +34,7 @@ def parser(raw_patch):
         l = f.readline()[:-1]
         if re.match(r'\|-', l):
             if num_st:
-                #table[num_st] = [num_st, num_line, x_st, y_st, name_st]
-                table[num_st] = [num_line, name_line, num_st, name_st, x_st, y_st]
+                table[num_st] = [num_line, name_line, num_st, name_st, x, y]
             num_st = num_st+1
         if re.match(r'\| style', l):
             num_line = int(re.findall(r'/цвет линии\|(\d+)', l)[0])
@@ -44,7 +43,7 @@ def parser(raw_patch):
             name_st = re.findall(r'name=(.*)\|nogoogle', l)[0]
             name_st = re.sub(r' [(].*', '', name_st)
             name_st = re.sub(r'ё', 'е', name_st)
-            x_st, y_st = re.findall(r'(\d{2}.\d{4})', l)
+            x, y = re.findall(r'(\d{2}.\d{4})', l)
 
     line_prev = 0
     for i in range(1, len(table)+1):

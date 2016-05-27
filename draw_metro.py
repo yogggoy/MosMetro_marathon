@@ -49,9 +49,9 @@ link_action = r'data\yandex\action.txt'
 link_stasion = r'data\yandex\station.txt'
 patch = link_tables(link_action, link_stasion)
 
-#==============================================================================
-# NEW table[num_st] = [№_line, name_line, №_st, name_st, x_st, y_st, (direct)]
-# NEW patch = [№_line, name_line, №_station, name_station, action/color]
+#=============================================================================
+# table[i] = [№_line, name_line, №_st, name_st, x_st, y_st, (link)]
+# patch[i] = [№_line, name_line, №_station, name_station, action/color]
 
 G=nx.Graph()
 pos = {}
