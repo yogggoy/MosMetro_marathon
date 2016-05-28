@@ -7,10 +7,10 @@ table = parser(link)
 
 def link_tables(link_action, link_stasion):
     '''
-    make pars MetroMarafon-patch, and return dict 'patch' with format: 
-    # patch = [№_line, name_line, №_station, name_station, action/color]
+    make pars MetroMarafon-path, and return dict 'path' with format: 
+    # path = [№_line, name_line, №_station, name_station, action/color]
     '''
-    patch = {}
+    path = {}
     action = {
         'выход':'r',            # red
         'проезд':'b',           # blue
@@ -26,7 +26,7 @@ def link_tables(link_action, link_stasion):
         for j in table:
             if (stroka[0].lower() == table[j][1].lower() and
                stroka[1].lower() == table[j][3].lower()):
-                patch[i] = table[j][0:4]
+                path[i] = table[j][0:4]
                 break
         else:
             print ('!!! ERROR: СТАНЦИЯ или ВЕТКА не найдена. lines:')
@@ -35,7 +35,7 @@ def link_tables(link_action, link_stasion):
 
         l = ya_action.readline()[:-1]
         if l in action:
-            patch[i].append(action[l])
+            path[i].append(action[l])
         else:
             print('!!! ERROR: ДЕЙСТВИЯ не совпадают. lines:', i, '-', l)
             break
@@ -43,17 +43,17 @@ def link_tables(link_action, link_stasion):
     ya_action.close()
     ya_station.close()
 
-    return patch
+    return path
 
-def self_test(patch):
+def self_test(path):
     st_closed = [x for x in range(1,201)]
     st_open = []
 
     for i in range(1, 455):
-        if patch[i][2] in st_closed:
-            st_closed.remove(patch[i][2])
-        if patch[i][2] not in st_open:
-            st_open.append(patch[i][2])
+        if path[i][2] in st_closed:
+            st_closed.remove(path[i][2])
+        if path[i][2] not in st_open:
+            st_open.append(path[i][2])
 
     if len(st_closed)>0 or len(st_open)<200:
         print('WARNING: Что-то пошло не так.',
@@ -64,8 +64,8 @@ def self_test(patch):
 if __name__ == "__main__":
     link_action = r'data\yandex\action.txt'
     link_stasion = r'data\yandex\station.txt'
-    patch = link_tables(link_action, link_stasion)
+    path = link_tables(link_action, link_stasion)
     
-    self_test(patch)
-    for i in patch:
-        print(i, patch[i])
+    self_test(path)
+    for i in path:
+        print(i, path[i])
