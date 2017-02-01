@@ -6,3 +6,4 @@ frames*
 *.png
 *.gif
 error*
+!images.gif
