@@ -15,7 +15,7 @@
 ```
 networkx    - построение графа "московского метро"
 matplotlib  - визуализация
-images2gif  - составление анимации
+images2gif  - составление анимации (скачать с https://github.com/isaacgerg/images2gif)
 ```
 
 структура
@@ -26,4 +26,10 @@ images2gif  - составление анимации
 
 render_gif
 
-[![](https://cdn.monetizejs.com/resources/button-32.png)](https://monetizejs.com/authorize?client_id=ESTHdCYOi18iLhhO&summary=true)
+запуск
+-------
+
+Сначала нужно отрисовать каждый пункт маршрута в отдельный кадр, для этого запустите `draw_metro.py`  
+После чего все кадры нужно собрать в GIF скриптом - `render_gif.py`
+
+![]()

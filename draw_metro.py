@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import networkx as nx
 from pars import lines_list
 from link_tables import link_tables, table
+from progress_bar_cmd import bar
 
 rcParams['figure.figsize'] = (10, 10)
 rcParams['figure.subplot.left'] = 0.05
@@ -78,7 +79,9 @@ try:
 except:
     pass
 
-for i in range(1, 455): #455
+frames = 455
+for i in range(1, frames): #455
+    bar(i, frames-1)
     if patch[i][2] in st_closed:
         st_closed.remove(patch[i][2])
     if patch[i][2] not in st_open:
@@ -108,4 +111,5 @@ for i in range(1, 455): #455
     if i< 454:
         plt.clf()
 
+print('complete. now run `render_gif.py`')
 plt.show()
