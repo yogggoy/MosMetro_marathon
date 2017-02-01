@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import os
 from matplotlib import rcParams
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -73,6 +73,11 @@ for b in lines_list:
 st_closed = [x for x in range(1,201)]
 st_open = []
 
+try:
+    os.mkdir("frames")
+except:
+    pass
+
 for i in range(1, 455): #455
     if patch[i][2] in st_closed:
         st_closed.remove(patch[i][2])
@@ -100,7 +105,7 @@ for i in range(1, 455): #455
             patch[i][3], family='Poiret One', size=20)
     plt.title(patch[i][1], family='Cambria', size='30', color='k')
     plt.savefig(r'frames\metro'+str(i)+'.png')
-    if i< 455:
+    if i< 454:
         plt.clf()
 
 plt.show()

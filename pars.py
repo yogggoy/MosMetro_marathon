@@ -28,33 +28,33 @@ def parser(raw_patch):
     '''
     table = {}
     num_st = 0
-    f = open(raw_patch, 'r')
+    # f = open(raw_patch, 'r')
+    with  open(raw_patch, 'r') as f:
+        for i in range(1850):
+            l = f.readline()[:-1]
+            if re.match(r'\|-', l):
+                if num_st:
+                    table[num_st] = [num_line, name_line, num_st, name_st, x, y]
+                num_st = num_st+1
+            if re.match(r'\| style', l):
+                num_line = int(re.findall(r'/цвет линии\|(\d+)', l)[0])
+                name_line = lines_list[num_line][2]
+            if re.match(r'\| {{coord', l):
+                name_st = re.findall(r'name=(.*)\|nogoogle', l)[0]
+                name_st = re.sub(r' [(].*', '', name_st)
+                name_st = re.sub(r'ё', 'е', name_st)
+                x, y = re.findall(r'(\d{2}.\d{4})', l)
 
-    for i in range(1850):
-        l = f.readline()[:-1]
-        if re.match(r'\|-', l):
-            if num_st:
-                table[num_st] = [num_line, name_line, num_st, name_st, x, y]
-            num_st = num_st+1
-        if re.match(r'\| style', l):
-            num_line = int(re.findall(r'/цвет линии\|(\d+)', l)[0])
-            name_line = lines_list[num_line][2]
-        if re.match(r'\| {{coord', l):
-            name_st = re.findall(r'name=(.*)\|nogoogle', l)[0]
-            name_st = re.sub(r' [(].*', '', name_st)
-            name_st = re.sub(r'ё', 'е', name_st)
-            x, y = re.findall(r'(\d{2}.\d{4})', l)
+        line_prev = 0
+        for i in range(1, len(table)+1):
+            if table[i][0] == line_prev:
+                if (i != 141)&(i != 74): # разрывы на ветках
+                    table[i].append(i-1)
+            line_prev = table[i][0]
+            if i == 80:
+                table[i].append(91)     # замыкание кольцевой
 
-    line_prev = 0
-    for i in range(1, len(table)+1):
-        if table[i][0] == line_prev:
-            if (i != 141)&(i != 74): # разрывы на ветках
-                table[i].append(i-1)
-        line_prev = table[i][0]
-        if i == 80:
-            table[i].append(91)     # замыкание кольцевой
-
-    f.close()
+    # f.close()
     return table
 
 if __name__ == "__main__":
